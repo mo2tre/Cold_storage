@@ -1,0 +1,10 @@
+{
+  "name": "cold-storage-backend",
+  "version-string": "0.1.0",
+  "dependencies": [
+    {
+      "name": "drogon",
+      "features": ["mysql"]
+    }
+  ]
+}

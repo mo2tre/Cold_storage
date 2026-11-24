@@ -1,0 +1,28 @@
+# Build outputs
+build/
+out/
+cmake-build-*/
+*.exe
+*.obj
+*.pdb
+*.ilk
+
+# vcpkg
+vcpkg_installed/
+
+# IDE
+.vs/
+.vscode/
+*.user
+CMakeUserPresets.json
+
+# Secrets / machine-specific config (never commit)
+backend/config/config.json
+*.env
+.env*
+*.pem
+*.key
+
+# Logs and backups
+*.log
+backups/

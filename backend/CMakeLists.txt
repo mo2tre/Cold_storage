@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.20)
+project(cold_storage_backend LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+find_package(Drogon CONFIG REQUIRED)
+
+add_executable(cold_storage_backend
+    main.cpp
+)
+
+target_link_libraries(cold_storage_backend PRIVATE Drogon::Drogon)
+
+# Copy the example config next to the executable for convenience
+add_custom_command(TARGET cold_storage_backend POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:cold_storage_backend>/config
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_CURRENT_SOURCE_DIR}/config/config.example.json
+        $<TARGET_FILE_DIR:cold_storage_backend>/config/config.example.json
+)
