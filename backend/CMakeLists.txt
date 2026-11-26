@@ -9,7 +9,11 @@ find_package(Drogon CONFIG REQUIRED)
 
 add_executable(cold_storage_backend
     main.cpp
+    controllers/HealthController.cpp
 )
+
+# Allow includes like "utils/ApiResponse.h" and "controllers/..."
+target_include_directories(cold_storage_backend PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(cold_storage_backend PRIVATE Drogon::Drogon)
 
