@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>images/cold_storage_hero.png</file>
+    </qresource>
+</RCC>
