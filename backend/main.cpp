@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "controllers/FarmerController.h"
 #include "controllers/HealthController.h"
 #include "utils/ApiResponse.h"
 
@@ -14,6 +15,7 @@ int main(int argc, char* argv[])
 
     // Register every controller module here.
     controllers::registerHealthRoutes();
+    controllers::registerFarmerRoutes();
 
     drogon::app().loadConfigFile(configPath);
     drogon::app().run();

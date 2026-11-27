@@ -50,6 +50,17 @@ inline drogon::HttpResponsePtr validationError(const std::string& message,
     return error(drogon::k422UnprocessableEntity, "VALIDATION_ERROR", message, details);
 }
 
+inline drogon::HttpResponsePtr badRequest(const std::string& message,
+                                          const Json::Value& details = Json::Value(Json::arrayValue))
+{
+    return error(drogon::k400BadRequest, "BAD_REQUEST", message, details);
+}
+
+inline drogon::HttpResponsePtr conflict(const std::string& message)
+{
+    return error(drogon::k409Conflict, "CONFLICT", message);
+}
+
 inline drogon::HttpResponsePtr notFound(const std::string& message = "Resource not found")
 {
     return error(drogon::k404NotFound, "NOT_FOUND", message);

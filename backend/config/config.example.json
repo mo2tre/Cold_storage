@@ -6,6 +6,21 @@
       "https": false
     }
   ],
+  "db_clients": [
+    {
+      "name": "default",
+      "rdbms": "mysql",
+      "host": "127.0.0.1",
+      "port": 3306,
+      "dbname": "cold_storage",
+      "user": "cold_app",
+      "passwd": "CHANGE_ME",
+      "is_fast": false,
+      "connection_number": 4,
+      "characterSet": "utf8mb4",
+      "timeout": 10.0
+    }
+  ],
   "app": {
     "number_of_threads": 4,
     "log": {
