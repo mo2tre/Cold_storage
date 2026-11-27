@@ -13,12 +13,20 @@ add_executable(cold_storage_backend
     controllers/HealthController.cpp
     controllers/FarmerController.cpp
     controllers/AuthController.cpp
+    controllers/ProductController.cpp
+    controllers/ColdRoomController.cpp
     services/FarmerService.cpp
     services/AuthService.cpp
+    services/ProductService.cpp
+    services/ColdRoomService.cpp
     repositories/FarmerRepository.cpp
     repositories/AuthRepository.cpp
+    repositories/ProductRepository.cpp
+    repositories/ColdRoomRepository.cpp
     dto/FarmerDto.cpp
     dto/AuthDto.cpp
+    dto/ProductDto.cpp
+    dto/ColdRoomDto.cpp
     utils/Crypto.cpp
     utils/PasswordPrompt.cpp
 )

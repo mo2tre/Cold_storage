@@ -76,7 +76,7 @@ Revokes the current token. `200` -> `"Logged out"`. The client then discards the
 
 ## Farmers
 
-Farmers are never deleted once they exist: deactivate with `is_active: false`.
+Farmers are never deleted once they exist: deactivate with `is_active: false`. (Farmers are updated with `PUT`, the full object; products and cold rooms with `PATCH`, partial.)
 
 ### Farmer object
 | Field        | Type            | Notes |
@@ -114,6 +114,46 @@ Example:
 Replaces all editable fields (send the full object, as the edit form holds all fields). Same validation as POST.
 `200` -> updated farmer. Errors: `404`, `409`, `422`, `400`.
 
+## Products
+
+Permissions: `products.read` (GET), `products.write` (POST, PATCH). Products are deactivated (`is_active: false`), not deleted.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | integer | Read-only |
+| `code` | string (<= 30) | Required, unique |
+| `name` | string (<= 150) | Required |
+| `min_temp_c`, `max_temp_c` | number | Required, -100..100, min <= max (degrees Celsius) |
+| `min_humidity_pct`, `max_humidity_pct` | number or null | Optional but both or neither, 0..100, min <= max |
+| `max_storage_days` | integer or null | 1..36500, maximum recommended storage duration |
+| `is_active` | boolean | Default `true` |
+| `created_at`, `updated_at` | string | Read-only, UTC |
+
+- `GET /products`: query `q` (name or code), `is_active`, `page`, `page_size`. Paginated, sorted by name.
+- `POST /products`: `201` with the created product. Errors `409` (duplicate code), `422`.
+- `GET /products/{id}`: `200` or `404`.
+- `PATCH /products/{id}`: **partial update**: send only the fields to change; the server validates the complete result. `200`, or `404`, `409`, `422`.
+
+## Cold rooms
+
+Permissions: `rooms.read` (GET), `rooms.write` (POST, PATCH, PUT compatibility).
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | integer | Read-only |
+| `code` | string (<= 30) | Required, unique |
+| `name` | string (<= 150) | Required |
+| `capacity_kg` | number | Required, > 0, up to 3 decimals |
+| `min_temp_c`, `max_temp_c` | number | Required, min <= max |
+| `min_humidity_pct`, `max_humidity_pct` | number or null | Same rule as products |
+| `is_active` | boolean | Default `true` |
+| `created_at`, `updated_at` | string | Read-only, UTC |
+
+- `GET /cold-rooms`, `POST /cold-rooms`, `GET /cold-rooms/{id}`, `PATCH /cold-rooms/{id}`: same behaviour as products (sorted by code).
+- `GET /cold-rooms/{id}/products` -> `{ "product_ids": [1, 2] }` (products that may be stored in the room).
+- `PUT /cold-rooms/{id}/products` with `{ "product_ids": [1, 2] }` replaces the whole set. `422` if an id is not an existing product (nothing changes). An empty array clears it.
+- Occupancy (`/cold-rooms/{id}/occupancy`) comes with the entries/stock milestone.
+
 ## Not available yet (planned)
-Users management, products, cold rooms, entries, inventory, transfers, exits, invoices.
+Users management, entries, inventory, transfers, exits, invoices.
 Each will be added here before implementation.

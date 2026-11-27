@@ -20,6 +20,14 @@ inline drogon::orm::DbClientPtr dbClient()
     }
 }
 
+inline RepoError makeRepoError(const drogon::orm::DrogonDbException& e)
+{
+    RepoError err;
+    err.message = e.base().what();
+    err.duplicate = err.message.find("Duplicate entry") != std::string::npos;
+    return err;
+}
+
 inline RepoError noDbError()
 {
     return RepoError{false, "database client not available"};

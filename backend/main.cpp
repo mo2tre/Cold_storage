@@ -4,8 +4,10 @@
 #include <string>
 
 #include "controllers/AuthController.h"
+#include "controllers/ColdRoomController.h"
 #include "controllers/FarmerController.h"
 #include "controllers/HealthController.h"
+#include "controllers/ProductController.h"
 #include "utils/ApiResponse.h"
 #include "utils/Crypto.h"
 #include "utils/PasswordPrompt.h"
@@ -47,6 +49,8 @@ int main(int argc, char* argv[])
     controllers::registerHealthRoutes();
     controllers::registerAuthRoutes();
     controllers::registerFarmerRoutes();
+    controllers::registerProductRoutes();
+    controllers::registerColdRoomRoutes();
 
     drogon::app().loadConfigFile(configPath);
     drogon::app().run();
