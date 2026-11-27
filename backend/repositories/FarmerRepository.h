@@ -8,17 +8,10 @@
 #include <string>
 
 #include "dto/FarmerDto.h"
+#include "repositories/RepoError.h"
 
 namespace repositories
 {
-struct RepoError
-{
-    bool duplicate = false;  // unique constraint violated (farmer code)
-    std::string message;     // for server logs only, never sent to clients
-};
-
-using ErrorCb = std::function<void(const RepoError&)>;
-
 // All SQL is parameterized. Every call is asynchronous.
 class FarmerRepository
 {

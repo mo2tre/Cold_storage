@@ -6,6 +6,7 @@
 #include <cctype>
 #include <cstdlib>
 
+#include "services/AuthService.h"
 #include "services/FarmerService.h"
 #include "utils/ApiResponse.h"
 
@@ -30,26 +31,40 @@ void registerFarmerRoutes()
     drogon::app().registerHandler(
         "/api/v1/farmers",
         [](const drogon::HttpRequestPtr& req, Callback&& callback) {
-            if (req->method() == drogon::Post)
-                services::FarmerService::create(req, std::move(callback));
-            else
-                services::FarmerService::list(req, std::move(callback));
+            const bool isPost = req->method() == drogon::Post;
+            Callback cb = std::move(callback);
+            services::AuthService::authorize(
+                req, isPost ? "farmers.write" : "farmers.read",
+                [req, cb, isPost](const services::AuthUser&) {
+                    if (isPost)
+                        services::FarmerService::create(req, cb);
+                    else
+                        services::FarmerService::list(req, cb);
+                },
+                cb);
         },
         {drogon::Get, drogon::Post});
 
     drogon::app().registerHandler(
         "/api/v1/farmers/{id}",
         [](const drogon::HttpRequestPtr& req, Callback&& callback, std::string id) {
+            Callback cb = std::move(callback);
             uint64_t farmerId = 0;
             if (!parseId(id, farmerId))
             {
-                callback(api::badRequest("Farmer id must be a positive integer"));
+                cb(api::badRequest("Farmer id must be a positive integer"));
                 return;
             }
-            if (req->method() == drogon::Put)
-                services::FarmerService::update(farmerId, req, std::move(callback));
-            else
-                services::FarmerService::getById(farmerId, std::move(callback));
+            const bool isPut = req->method() == drogon::Put;
+            services::AuthService::authorize(
+                req, isPut ? "farmers.write" : "farmers.read",
+                [req, cb, isPut, farmerId](const services::AuthUser&) {
+                    if (isPut)
+                        services::FarmerService::update(farmerId, req, cb);
+                    else
+                        services::FarmerService::getById(farmerId, cb);
+                },
+                cb);
         },
         {drogon::Get, drogon::Put});
 }

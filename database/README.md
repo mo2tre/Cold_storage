@@ -21,3 +21,20 @@ MySQL 8.4 LTS. Versioned, forward-only migrations: never edit a migration that w
    ```powershell
    .\database\apply_migrations.ps1 -MysqlExe "C:\Program Files\MySQL\MySQL Server 8.4\bin\mysql.exe" -Database cold_storage -User root -Seeds
    ```
+
+## Create the first Administrator (once)
+
+No user is seeded, so nobody can log in until you create one.
+
+1. Generate a password hash (the password is typed hidden and is not stored anywhere):
+   ```powershell
+   cd backend
+   .\build\Release\cold_storage_backend.exe --hash-password
+   ```
+   It prints one line starting with `pbkdf2_sha256$...`. Copy it.
+2. In Workbench (database `cold_storage`), paste your hash:
+   ```sql
+   INSERT INTO users (username, full_name, password_hash, role_id)
+   SELECT 'admin', 'Administrator', 'PASTE_THE_HASH_HERE', id FROM roles WHERE name = 'Administrator';
+   ```
+3. Log in with `POST /api/v1/auth/login` (see `docs/api-contract-v1.md`).

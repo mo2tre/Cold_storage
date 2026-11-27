@@ -6,20 +6,27 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Drogon CONFIG REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 add_executable(cold_storage_backend
     main.cpp
     controllers/HealthController.cpp
     controllers/FarmerController.cpp
+    controllers/AuthController.cpp
     services/FarmerService.cpp
+    services/AuthService.cpp
     repositories/FarmerRepository.cpp
+    repositories/AuthRepository.cpp
     dto/FarmerDto.cpp
+    dto/AuthDto.cpp
+    utils/Crypto.cpp
+    utils/PasswordPrompt.cpp
 )
 
 # Allow includes like "utils/ApiResponse.h" and "controllers/..."
 target_include_directories(cold_storage_backend PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(cold_storage_backend PRIVATE Drogon::Drogon)
+target_link_libraries(cold_storage_backend PRIVATE Drogon::Drogon OpenSSL::Crypto)
 
 # Copy the example config next to the executable for convenience
 add_custom_command(TARGET cold_storage_backend POST_BUILD

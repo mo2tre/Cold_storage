@@ -5,6 +5,8 @@
 
 #include <memory>
 
+#include "repositories/Db.h"
+
 namespace repositories
 {
 namespace
@@ -67,7 +69,12 @@ const char* kWhere =
 void FarmerRepository::list(uint64_t page, uint64_t pageSize, const std::string& search, int activeFilter,
                             std::function<void(Json::Value, uint64_t)> onOk, ErrorCb onErr)
 {
-    auto db = drogon::app().getDbClient();
+    auto db = dbClient();
+    if (!db)
+    {
+        onErr(noDbError());
+        return;
+    }
     const std::string pattern = "%" + search + "%";
     const uint64_t offset = (page - 1) * pageSize;
 
@@ -75,7 +82,7 @@ void FarmerRepository::list(uint64_t page, uint64_t pageSize, const std::string&
         std::string("SELECT COUNT(*) AS c FROM farmers") + kWhere,
         [=](const Result& countRes) {
             const uint64_t total = countRes.empty() ? 0 : countRes[0]["c"].as<uint64_t>();
-            drogon::app().getDbClient()->execSqlAsync(
+            db->execSqlAsync(
                 std::string("SELECT ") + kColumns + " FROM farmers" + kWhere +
                     " ORDER BY full_name ASC, id ASC LIMIT ? OFFSET ?",
                 [=](const Result& res) {
@@ -93,7 +100,13 @@ void FarmerRepository::list(uint64_t page, uint64_t pageSize, const std::string&
 
 void FarmerRepository::findById(uint64_t id, std::function<void(std::optional<Json::Value>)> onOk, ErrorCb onErr)
 {
-    drogon::app().getDbClient()->execSqlAsync(
+    auto db = dbClient();
+    if (!db)
+    {
+        onErr(noDbError());
+        return;
+    }
+    db->execSqlAsync(
         std::string("SELECT ") + kColumns + " FROM farmers WHERE id = ?",
         [=](const Result& res) {
             if (res.empty())
@@ -106,7 +119,13 @@ void FarmerRepository::findById(uint64_t id, std::function<void(std::optional<Js
 
 void FarmerRepository::create(const dto::FarmerInput& in, std::function<void(Json::Value)> onOk, ErrorCb onErr)
 {
-    drogon::app().getDbClient()->execSqlAsync(
+    auto db = dbClient();
+    if (!db)
+    {
+        onErr(noDbError());
+        return;
+    }
+    db->execSqlAsync(
         "INSERT INTO farmers (code, full_name, phone, email, address, identifier, notes, is_active) "
         "VALUES (?, ?, NULLIF(?, ''), NULLIF(?, ''), NULLIF(?, ''), NULLIF(?, ''), NULLIF(?, ''), ?)",
         [=](const Result& res) {
@@ -129,7 +148,13 @@ void FarmerRepository::create(const dto::FarmerInput& in, std::function<void(Jso
 void FarmerRepository::update(uint64_t id, const dto::FarmerInput& in,
                               std::function<void(std::optional<Json::Value>)> onOk, ErrorCb onErr)
 {
-    drogon::app().getDbClient()->execSqlAsync(
+    auto db = dbClient();
+    if (!db)
+    {
+        onErr(noDbError());
+        return;
+    }
+    db->execSqlAsync(
         "UPDATE farmers SET code = ?, full_name = ?, phone = NULLIF(?, ''), email = NULLIF(?, ''), "
         "address = NULLIF(?, ''), identifier = NULLIF(?, ''), notes = NULLIF(?, ''), is_active = ? WHERE id = ?",
         [=](const Result&) {
